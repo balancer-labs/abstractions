@@ -666,13 +666,13 @@ WITH rows AS (
             result AS token_a_amount_raw,
             amount AS token_b_amount_raw,
             NULL::numeric AS usd_amount,
-            dstToken AS token_a_address,
-            srcToken AS token_b_address,
+            "dstToken" AS token_a_address,
+            "srcToken" AS token_b_address,
             contract_address AS exchange_contract_address,
             evt_tx_hash AS tx_hash,
             NULL::integer[] AS trace_address,
             evt_index
-        FROM onelp."MooniSwap_evt_Swapped"
+        FROM onelp."Mooniswap_evt_Swapped"
 
         UNION ALL
 
