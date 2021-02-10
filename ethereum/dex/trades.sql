@@ -645,8 +645,12 @@ WITH rows AS (
             result AS token_a_amount_raw,
             amount AS token_b_amount_raw,
             NULL::numeric AS usd_amount,
-            dst AS token_a_address,
-            src AS token_b_address,
+            CASE WHEN dst = '\xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' OR dst = '\x0000000000000000000000000000000000000000' THEN 
+                '\xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'::bytea ELSE dst
+            END AS token_a_address,
+            CASE WHEN src = '\xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' OR src = '\x0000000000000000000000000000000000000000' THEN 
+                '\xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'::bytea ELSE src
+            END AS token_b_address,
             contract_address AS exchange_contract_address,
             evt_tx_hash AS tx_hash,
             NULL::integer[] AS trace_address,
@@ -666,8 +670,12 @@ WITH rows AS (
             result AS token_a_amount_raw,
             amount AS token_b_amount_raw,
             NULL::numeric AS usd_amount,
-            "dstToken" AS token_a_address,
-            "srcToken" AS token_b_address,
+            CASE WHEN "dstToken" = '\xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' OR "dstToken" = '\x0000000000000000000000000000000000000000' THEN 
+                '\xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'::bytea ELSE "dstToken"
+            END AS token_a_address,
+            CASE WHEN "srcToken" = '\xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' OR "srcToken" = '\x0000000000000000000000000000000000000000' THEN 
+                '\xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'::bytea ELSE "srcToken"
+            END AS token_b_address,
             contract_address AS exchange_contract_address,
             evt_tx_hash AS tx_hash,
             NULL::integer[] AS trace_address,
