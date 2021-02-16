@@ -50,6 +50,21 @@ WITH rows AS (
         evt_index,
         trade_id
     )
+    WITH extended_prices_usd AS (
+        SELECT minute, contract_address, price FROM prices.usd
+        WHERE contract_address NOT IN ('\xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', '\x0000000000000000000000000000000000000000') -- pointless now, but future-proof
+        UNION ALL
+        SELECT minute, '\xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' as contract_address, price FROM prices.layer1_usd 
+        WHERE symbol ='ETH'
+        UNION ALL
+        SELECT minute, '\x0000000000000000000000000000000000000000' as contract_address, price FROM prices.layer1_usd 
+        WHERE symbol ='ETH'
+    ), extended_token_info AS (
+        SELECT symbol, decimals, contract_address FROM erc20.tokens
+        WHERE contract_address <> '\x0000000000000000000000000000000000000000' -- pointless now, but future-proof
+        UNION ALL
+        SELECT 'ETH', 18, '\x0000000000000000000000000000000000000000' as contract_address
+    )
     SELECT
         dexs.block_time,
         erc20a.symbol AS token_a_symbol,
@@ -849,13 +864,13 @@ WITH rows AS (
         AND tx.block_time < end_ts
         AND tx.block_number >= start_block
         AND tx.block_number < end_block
-    LEFT JOIN erc20.tokens erc20a ON erc20a.contract_address = dexs.token_a_address
-    LEFT JOIN erc20.tokens erc20b ON erc20b.contract_address = dexs.token_b_address
-    LEFT JOIN prices.usd pa ON pa.minute = date_trunc('minute', dexs.block_time)
+    LEFT JOIN extended_token_info erc20a ON erc20a.contract_address = dexs.token_a_address
+    LEFT JOIN extended_token_info erc20b ON erc20b.contract_address = dexs.token_b_address
+    LEFT JOIN extended_prices_usd pa ON pa.minute = date_trunc('minute', dexs.block_time)
         AND pa.contract_address = dexs.token_a_address
         AND pa.minute >= start_ts
         AND pa.minute < end_ts
-    LEFT JOIN prices.usd pb ON pb.minute = date_trunc('minute', dexs.block_time)
+    LEFT JOIN extended_prices_usd pb ON pb.minute = date_trunc('minute', dexs.block_time)
         AND pb.contract_address = dexs.token_b_address
         AND pb.minute >= start_ts
         AND pb.minute < end_ts
